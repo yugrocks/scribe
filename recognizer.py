@@ -2,8 +2,21 @@ import pyaudio
 import wave
 import sphinxbase
 import os
-
+import pyttsx #neeeded to be installed first to add text-to-speech functionality
 # Import sometimes fails first time around because of a Cython issue.
+
+
+speech_engine = pyttsx.init() #initialize the driver
+speech_engine.setProperty('rate', 150) #set the rate
+voices=speech_engine.getProperty('voices') #get the 'voices' property
+
+def speak(text):
+    speech_engine.setProperty('voice',voices[1].id) #change the voices property if required 
+    speech_engine.say(text) #convert 'text' to speech
+    speech_engine.runAndWait()
+
+
+
 try:
     import pocketsphinx
 except ValueError:
@@ -39,7 +52,7 @@ def find_device(p, tags):
 
     if device_index is None:
         print("No preferred input found; using default input device.")
-
+        speak("No preferred input found; using default input device.")
     return device_index
 
 def save_audio(wav_file):
@@ -62,7 +75,7 @@ def save_audio(wav_file):
     )
 
     print("* recording")
-
+    speak("recording")
     frames = []
 
     for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
@@ -70,7 +83,7 @@ def save_audio(wav_file):
         frames.append(data)
 
     print("* done recording")
-
+    speak("done recording")
     stream.stop_stream()
     stream.close()
 
@@ -97,4 +110,5 @@ def recognize(wav_file):
 if __name__ == '__main__':
     save_audio(WAVE_OUTPUT_FILENAME)
     result = recognize(WAVE_OUTPUT_FILENAME)
-    print "You just said: {0}".format(result[0])
+    print ("You just said: {0}".format(result[0]))
+    speak("You just said: {0}".format(result[0]))
